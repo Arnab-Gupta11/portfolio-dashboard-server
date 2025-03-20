@@ -7,6 +7,7 @@ const ProjectSchema = new Schema<IProject>(
     description: { type: String, required: true },
     features: { type: [String], required: true },
     technologies: { type: String, required: true },
+    skills: [{ type: Schema.Types.ObjectId, ref: 'Skill', require: true }],
     thumbnail: { type: String, required: true },
     fullImage: { type: String, required: true },
     type: {

@@ -10,7 +10,7 @@ const createProjectInDB = async (payload: IProject) => {
 
 // Get all projects from DB
 const getAllProjectsFromDB = async () => {
-  const result = await Project.find();
+  const result = await Project.find().sort({ createdAt: -1 });
   return result;
 };
 // Get all Featured projects from DB
@@ -25,22 +25,26 @@ const getAllFeaturedProjectFromDB = async () => {
 
 //Update Project status
 const updateProjectStatusIntoDB = async (id: string) => {
-  const result = await Project.findByIdAndUpdate(
-    id,
-    { $set: { isFeatured: { $ne: true } } }, // Toggles the isFeatured value
-    { new: true, runValidators: true },
-  );
+  // Find the project first
+  const project = await Project.findById(id);
 
-  if (!result) {
+  if (!project) {
     throw new AppError(404, 'Project not found');
   }
 
-  return result;
+  // Toggle the `isFeatured` value
+  const updatedProject = await Project.findByIdAndUpdate(
+    id,
+    { $set: { isFeatured: !project.isFeatured } }, // Properly toggles the boolean value
+    { new: true, runValidators: true },
+  );
+
+  return updatedProject;
 };
 
 // Get single project by ID
 const getSingleProjectFromDB = async (id: string) => {
-  const result = await Project.findById(id);
+  const result = await Project.findById(id).populate('skills');
   return result;
 };
 
